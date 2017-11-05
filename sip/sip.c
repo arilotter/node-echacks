@@ -10,8 +10,7 @@ pjsua_recorder_id rec_id;
 pjsua_conf_port_id rec_port;
 
 /* Callback called by the library upon receiving incoming call */
-static void on_incoming_call(pjsua_acc_id acc_id, pjsua_call_id call_id,
-                             pjsip_rx_data *rdata)
+static void on_incoming_call(pjsua_acc_id acc_id, pjsua_call_id call_id, pjsip_rx_data *rdata)
 {
     // this shouldn't happen
     pjsua_call_info ci;
@@ -52,8 +51,8 @@ static void on_call_media_state(pjsua_call_id call_id)
     if (ci.media_status == PJSUA_CALL_MEDIA_ACTIVE)
     {
         // When media is active, connect call to sound device.
-        pjsua_conf_connect(ci.conf_slot, 0);
-        pjsua_conf_connect(0, ci.conf_slot);
+        // pjsua_conf_connect(ci.conf_slot, 0);
+        // pjsua_conf_connect(0, ci.conf_slot);
         rec_id = PJSUA_INVALID_ID;
         pj_str_t rec_raw_file = pj_str("fifo.wav");
         pj_status_t status = pjsua_recorder_create(&rec_raw_file, 0, NULL, -1, 0, &rec_id);
@@ -96,6 +95,8 @@ int main(int argc, char *argv[])
         status = pjsua_init(&cfg, &log_cfg, NULL);
         if (status != PJ_SUCCESS)
             error_exit("Error in pjsua_init()", status);
+        pjsua_set_null_snd_dev();
+            
     }
 
     /* Add UDP transport. */
@@ -155,7 +156,8 @@ int main(int argc, char *argv[])
         if (option[0] == 'q')
             break;
 
-        if (option[0] == 'h') {
+        if (option[0] == 'h')
+        {
             pjsua_call_hangup_all();
         }
     }

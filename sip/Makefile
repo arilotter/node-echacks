@@ -1,5 +1,5 @@
 #Modify this to point to the PJSIP location.
-PJBASE=../pjproject-2.7
+PJBASE=../../pjproject-2.7
 
 include $(PJBASE)/build.mak
 
