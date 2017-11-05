@@ -33,11 +33,9 @@ app.post("/call", (req, res) => {
     })
   ];
   setTimeout(() => {
-    spawn(
-      "tail -n +1 -f fifo.wav | amodem recv --audio-library - --input -",
-      [],
-      { shell: true }
-    ).stdout.on("data", data => {
+    spawn("amodem recv --audio-library - --input fifo.wav", [], {
+      shell: true
+    }).stdout.on("data", data => {
       console.log(data);
     });
   }, 6000);
