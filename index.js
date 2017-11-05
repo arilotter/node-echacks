@@ -40,7 +40,7 @@ app.post("/call", (req, res) => {
     ).stdout.on("data", data => {
       console.log(data);
     });
-  }, 5000);
+  }, 6000);
   // Create TwiML response
   const twiml = new VoiceResponse();
   const dial = twiml.dial();
