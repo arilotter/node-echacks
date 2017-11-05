@@ -26,7 +26,7 @@ app.post("/call", (req, res) => {
     `${path.join(
       SIP_FOLDER,
       "sip"
-    )} | ffmpeg -hide_banner -loglevel panic -f alaw -i pipe:0 -ar 8000 -ab 64000 -f ogg pipe:1`, //  minimodem --rx -R 8000 -f input.ogg 30
+    )}`, // | ffmpeg -hide_banner -loglevel panic -f alaw -i /dev/stdin -ar 8000 -ab 64000 -f ogg /dev/stdout | minimodem --rx -R 8000 -f input.ogg 30
     [],
     { shell: true }
   );
@@ -36,6 +36,9 @@ app.post("/call", (req, res) => {
   p.stderr.on("data", data => {
     console.log(data.toString("utf8"));
   });
+  p.on('close', () => {
+    delete calls[from];
+  })
   calls[from] = p;
 
   // Create TwiML response
