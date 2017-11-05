@@ -31,7 +31,7 @@ app.post("/call", (req, res) => {
     exec(path.join(SIP_FOLDER, "sip"), () => {
       console.log(`SIP for ${from} exited.`);
     }),
-    exec("amodem recv --input fifo.wav", (err, stdout, stderr) => {
+    exec("tail -n +1 -f fifo.wav | amodem recv --input -", (err, stdout, stderr) => {
       console.log(`Got data: ${stdout}`);
       console.log(`amodem for ${from} exited.`);
     })
