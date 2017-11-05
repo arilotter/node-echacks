@@ -26,7 +26,7 @@ app.post("/call", (req, res) => {
     `${path.join(
       SIP_FOLDER,
       "sip"
-    )} | minimodem --rx -R 8000 -f input.RAW 30`,
+    )} | echo`,
     [],
     { shell: true }
   );
