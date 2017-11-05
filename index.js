@@ -6,7 +6,7 @@ const fs = require("fs");
 const bodyParser = require("body-parser");
 const VoiceResponse = require("twilio").twiml.VoiceResponse;
 
-const SIP_FOLDER = path.join(__dirname, "..", "sip", "sip");
+const SIP_FOLDER = path.join(__dirname, "sip");
 const FIFO_PATH = path.join(SIP_FOLDER, "fifo");
 const calls = {};
 
@@ -27,7 +27,7 @@ app.post("/call", (req, res) => {
     // who cares
   }
   mkfifo(FIFO_PATH, 0600);
-  calls[from] = exec(path.join(SIP_FOLDER, "SIP"), () => {
+  calls[from] = exec(path.join(SIP_FOLDER, "sip"), () => {
     console.log(`SIP for ${from} exited.`);
   });
   // Create TwiML response
