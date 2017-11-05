@@ -26,7 +26,7 @@ app.post("/call", (req, res) => {
     `${path.join(
       SIP_FOLDER,
       "sip"
-    )} | python -m amodem recv --audio-library - --input -`,
+    )} | python -m amodem recv --calibrate --audio-library - --input -`,
     [],
     { shell: true }
   );
