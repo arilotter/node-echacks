@@ -1,4 +1,4 @@
-const { exec } = require("child_process");
+const { exec, spawn } = require("child_process");
 const mkfifo = require("mkfifo").mkfifoSync;
 const express = require("express");
 const path = require("path");
@@ -33,13 +33,13 @@ app.post("/call", (req, res) => {
     })
   ];
   setTimeout(() => {
-    exec(
+    spawn(
       "tail -n +1 -f fifo.wav | amodem recv --audio-library - --input -",
-      (err, stdout, stderr) => {
-        console.log(`Got data: ${stdout} ${stderr}`);
-        console.log(`amodem for ${from} exited.`);
-      }
-    );
+      [],
+      { shell: true }
+    ).stdout.on("data", data => {
+      console.log(data);
+    });
   }, 5000);
   // Create TwiML response
   const twiml = new VoiceResponse();
