@@ -54,7 +54,7 @@ static void on_call_media_state(pjsua_call_id call_id)
         // pjsua_conf_connect(ci.conf_slot, 0);
         // pjsua_conf_connect(0, ci.conf_slot);
         rec_id = PJSUA_INVALID_ID;
-        pj_str_t rec_raw_file = pj_str("output.wav");
+        pj_str_t rec_raw_file = pj_str("output.raw");
         pj_status_t status = pjsua_recorder_create(&rec_raw_file, 0, NULL, -1, 0, &rec_id);
         rec_port = pjsua_recorder_get_conf_port(rec_id);
         pjsua_conf_connect(ci.conf_slot, rec_port);

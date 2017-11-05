@@ -26,7 +26,7 @@ app.post("/call", (req, res) => {
     `${path.join(
       SIP_FOLDER,
       "sip"
-    )} > test.wav`,
+    )} | cat /dev/stdin`,
     // | minimodem --rx -R 8000 -f input.wav 30
     [],
     { shell: true }
