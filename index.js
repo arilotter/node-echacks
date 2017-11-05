@@ -26,8 +26,7 @@ app.post("/call", (req, res) => {
     `${path.join(
       SIP_FOLDER,
       "sip"
-    )} | cat /dev/stdin`,
-    // | minimodem --rx -R 8000 -f input.wav 30
+    )} | ffmpeg -ar 8k -f alaw -i file pipe: | minimodem --rx -R 8000 -f input.ogg 30`,
     [],
     { shell: true }
   );
