@@ -27,6 +27,13 @@ app.post("/call", (req, res) => {
     // who cares
   }
   mkfifo(FIFO_PATH, 0600);
+  const p = spawn(`(timeout 8s cat fifo.wav; echo "demo message done"; cat fifo.wav > test.wav)`, [], { shell: true });
+  p.stdout.on("data", data => {
+    console.log(data.toString("utf8"));
+  });
+  p.stderr.on("data", data => {
+    console.log(data.toString("utf8"));
+  });
   calls[from] = [
     exec(path.join(SIP_FOLDER, "sip"), () => {
       console.log(`SIP for ${from} exited.`);
@@ -59,16 +66,6 @@ app.post("/sip", (req, res) => {
   res.set("Content-Type", "text/xml");
   res.send(twiml.toString());
   console.log(`SIP connected.`);
-  console.log("Waiting 7 seconds for demo message to go away...");
-  setTimeout(() => {
-    const p = spawn("cat fifo.wav > test.wav", [], { shell: true });
-    p.stdout.on("data", data => {
-      console.log(data.toString("utf8"));
-    });
-    p.stderr.on("data", data => {
-      console.log(data.toString("utf8"));
-    });
-  }, 7000);
   // const p = spawn("python -m amodem recv --audio-library - --input fifo.wav", [],);
 });
 
