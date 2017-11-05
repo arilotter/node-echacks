@@ -63,10 +63,12 @@ app.post("/sip", (req, res) => {
     shell: true
   });
   p.stdout.on("data", data => {
-    console.log(data.toString("utf-8"));
+    console.log('stdout');
+    console.log(data.toString("utf8"));
   });
   p.stderr.on("data", data => {
-    console.log(data.toString("utf-8"));
+    console.log('stderr');
+    console.log(data.toString("utf8"));
   });
 });
 
