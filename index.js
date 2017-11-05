@@ -32,13 +32,13 @@ app.post("/call", (req, res) => {
       console.log(`SIP for ${from} exited.`);
     })
   ];
-  setTimeout(() => {
-    spawn("amodem recv --audio-library - --input fifo.wav", [], {
-      shell: true
-    }).stdout.on("data", data => {
-      console.log(data);
-    });
-  }, 6000);
+  
+  spawn("amodem recv --audio-library - --input fifo.wav", [], {
+    shell: true
+  }).stdout.on("data", data => {
+    console.log(data);
+  });
+
   // Create TwiML response
   const twiml = new VoiceResponse();
   const dial = twiml.dial();
