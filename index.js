@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 const VoiceResponse = require("twilio").twiml.VoiceResponse;
 
 const SIP_FOLDER = path.join(__dirname, "sip");
-const FIFO_PATH = path.join(SIP_FOLDER, "fifo");
+const FIFO_PATH = path.join(SIP_FOLDER, "fifo.wav");
 const calls = {};
 
 const app = express();
@@ -27,9 +27,15 @@ app.post("/call", (req, res) => {
     // who cares
   }
   mkfifo(FIFO_PATH, 0600);
-  calls[from] = exec(path.join(SIP_FOLDER, "sip"), () => {
-    console.log(`SIP for ${from} exited.`);
-  });
+  calls[from] = [
+    exec(path.join(SIP_FOLDER, "sip"), () => {
+      console.log(`SIP for ${from} exited.`);
+    }),
+    exec("amodem recv --input fifo.wav", (err, stdout, stderr) => {
+      console.log(`Got data: ${stdout}`);
+      console.log(`amodem for ${from} exited.`);
+    })
+  ];
   // Create TwiML response
   const twiml = new VoiceResponse();
   const dial = twiml.dial();
@@ -64,7 +70,7 @@ app.post("/status", ({ body }, res) => {
     const sip = calls[body.From];
     if (sip) {
       console.log(`Killing SIP for ${body.From}`);
-      sip.kill();
+      sip.forEach(proc => proc.kill());
     } else {
       console.log(
         "error: tried to kill a sip instance that doesn't exist. wat."
@@ -78,5 +84,5 @@ app.listen(80, "0.0.0.0");
 
 console.log("TwiML server running at http://127.0.0.1:80/");
 process.on("exit", () => {
-  calls.keys().forEach(num => calls[num].kill());
+  calls.keys().forEach(num => calls[num].forEach(proc => proc.kill()));
 });
