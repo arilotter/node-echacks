@@ -37,6 +37,7 @@ app.post("/call", (req, res) => {
     console.log(data.toString("utf8"));
   });
   p.on('close', () => {
+    console.log(`SIP for ${from} closed.`);
     delete calls[from];
   })
   calls[from] = p;
