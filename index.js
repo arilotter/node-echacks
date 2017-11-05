@@ -21,24 +21,20 @@ app.post("/call", (req, res) => {
   // This is a regular, from-a-telephone call - start the SIP call.
   console.log(`New call from ${from}`);
   console.log("Starting SIP...");
-  try {
-    fs.unlinkSync(FIFO_PATH);
-  } catch (e) {
-    // who cares
-  }
-  mkfifo(FIFO_PATH, 0600);
-  const p = spawn(`(timeout 8s cat fifo.wav; echo "demo message done"; cat fifo.wav > test.wav)`, [], { shell: true });
+
+  const p = spawn(
+    `${path.join(
+      SIP_FOLDER,
+      "sip"
+    )} | python -m amodem recv --audio-library - --input -`
+  );
   p.stdout.on("data", data => {
     console.log(data.toString("utf8"));
   });
   p.stderr.on("data", data => {
     console.log(data.toString("utf8"));
   });
-  calls[from] = [
-    exec(path.join(SIP_FOLDER, "sip"), () => {
-      console.log(`SIP for ${from} exited.`);
-    })
-  ];
+  calls[from] = p;
 
   // Create TwiML response
   const twiml = new VoiceResponse();
@@ -66,7 +62,6 @@ app.post("/sip", (req, res) => {
   res.set("Content-Type", "text/xml");
   res.send(twiml.toString());
   console.log(`SIP connected.`);
-  // const p = spawn("python -m amodem recv --audio-library - --input fifo.wav", [],);
 });
 
 app.post("/status", ({ body }, res) => {
@@ -75,7 +70,7 @@ app.post("/status", ({ body }, res) => {
     const sip = calls[body.From];
     if (sip) {
       console.log(`Killing SIP for ${body.From}`);
-      sip.forEach(proc => proc.kill());
+      sip.kill();
     } else {
       console.log(
         "error: tried to kill a sip instance that doesn't exist. wat."
@@ -89,5 +84,5 @@ app.listen(80, "0.0.0.0");
 
 console.log("TwiML server running at http://127.0.0.1:80/");
 process.on("exit", () => {
-  calls.keys().forEach(num => calls[num].forEach(proc => proc.kill()));
+  calls.keys().forEach(num => calls[num].kill());
 });

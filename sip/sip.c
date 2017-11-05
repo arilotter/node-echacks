@@ -96,7 +96,6 @@ int main(int argc, char *argv[])
         if (status != PJ_SUCCESS)
             error_exit("Error in pjsua_init()", status);
         pjsua_set_null_snd_dev();
-            
     }
 
     /* Add UDP transport. */
