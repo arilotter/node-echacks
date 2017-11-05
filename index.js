@@ -1,18 +1,18 @@
 const { exec } = require("child_process");
-const mkfifo = require('mkfifo').mkfifoSync;
+const mkfifo = require("mkfifo").mkfifoSync;
 const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
 const VoiceResponse = require("twilio").twiml.VoiceResponse;
 
 const SIP_FOLDER = path.join(__dirname, "..", "sip", "sip");
-const FIFO_PATH = path.join(SIP_FOLDER, 'fifo');
+const FIFO_PATH = path.join(SIP_FOLDER, "fifo");
 const calls = {};
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.get("/", (req, res) => {
-  res.send('hello!');
+  res.send("hello!");
 });
 
 app.post("/call", (req, res) => {
@@ -20,13 +20,9 @@ app.post("/call", (req, res) => {
   // This is a regular, from-a-telephone call - start the SIP call.
   console.log(`New call from ${from}`);
   console.log("Starting SIP...");
-  try {
   fs.unlinkSync(FIFO_PATH);
-} catch {
-  // who cares
-}
   mkfifo(FIFO_PATH, 0600);
-  calls[from] = exec(path.join(SIP_FOLDER, 'SIP'), () => {
+  calls[from] = exec(path.join(SIP_FOLDER, "SIP"), () => {
     console.log(`SIP for ${from} exited.`);
   });
   // Create TwiML response
