@@ -26,7 +26,7 @@ app.post("/call", (req, res) => {
     `${path.join(
       SIP_FOLDER,
       "sip"
-    )} | ffmpeg -f alaw -i pipe:0 -ar 8000 -ab 64000 -f ogg pipe:1`, //  minimodem --rx -R 8000 -f input.ogg 30
+    )} | ffmpeg -hide_banner -loglevel panic -f alaw -i pipe:0 -ar 8000 -ab 64000 -f ogg pipe:1`, //  minimodem --rx -R 8000 -f input.ogg 30
     [],
     { shell: true }
   );
