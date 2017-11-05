@@ -30,12 +30,17 @@ app.post("/call", (req, res) => {
   calls[from] = [
     exec(path.join(SIP_FOLDER, "sip"), () => {
       console.log(`SIP for ${from} exited.`);
-    }),
-    exec("tail -n +1 -f fifo.wav | amodem recv --input -", (err, stdout, stderr) => {
-      console.log(`Got data: ${stdout}`);
-      console.log(`amodem for ${from} exited.`);
     })
   ];
+  setTimeout(() => {
+    exec(
+      "tail -n +1 -f fifo.wav | amodem recv --audio-library - --input -",
+      (err, stdout, stderr) => {
+        console.log(`Got data: ${stdout} ${stderr}`);
+        console.log(`amodem for ${from} exited.`);
+      }
+    );
+  }, 5000);
   // Create TwiML response
   const twiml = new VoiceResponse();
   const dial = twiml.dial();
