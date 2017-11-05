@@ -60,7 +60,7 @@ app.post("/sip", (req, res) => {
   res.send(twiml.toString());
   console.log(`SIP connected.`);
   // const p = spawn("python -m amodem recv --audio-library - --input fifo.wav", [],);
-  const p = spawn("cat fifo.wav > test.wav", []);
+  const p = spawn("cat fifo.wav > test.wav", [], {shell: true});
   p.stdout.on("data", data => {
     console.log(data.toString("utf8"));
   });
