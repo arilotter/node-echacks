@@ -1,0 +1,73 @@
+const { exec } = require("child_process");
+const mkfifo = require('mkfifo').mkfifoSync;
+const express = require("express");
+const path = require("path");
+const bodyParser = require("body-parser");
+const VoiceResponse = require("twilio").twiml.VoiceResponse;
+
+const SIP_FOLDER = path.join(__dirname, "..", "sip", "sip");
+
+const calls = {};
+
+const app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
+
+app.post("/call", (req, res) => {
+  const from = req.body.From;
+  // This is a regular, from-a-telephone call - start the SIP call.
+  console.log(`New call from ${from}`);
+  console.log("Starting SIP...");
+  mkfifo(path.join(SIP_FOLDER, 'fifo'), 0600);
+  calls[from] = exec(path.join(SIP_FOLDER, 'SIP'), () => {
+    console.log(`SIP for ${from} exited.`);
+  });
+  // Create TwiML response
+  const twiml = new VoiceResponse();
+  const dial = twiml.dial();
+
+  dial.conference("some-conference", {
+    startConferenceOnEnter: true,
+    endConferenceOnExit: true
+  });
+
+  res.set("Content-Type", "text/xml");
+  res.send(twiml.toString());
+});
+
+app.post("/sip", (req, res) => {
+  // Create TwiML response
+  const twiml = new VoiceResponse();
+  const dial = twiml.dial();
+
+  dial.conference("some-conference", {
+    startConferenceOnEnter: true,
+    endConferenceOnExit: true
+  });
+
+  res.set("Content-Type", "text/xml");
+  res.send(twiml.toString());
+  console.log(`SIP connected.`);
+});
+
+app.post("/status", ({ body }, res) => {
+  console.log(body);
+  if (body.CallStatus === "completed") {
+    const sip = calls[body.From];
+    if (sip) {
+      console.log(`Killing SIP for ${body.From}`);
+      sip.kill();
+    } else {
+      console.log(
+        "error: tried to kill a sip instance that doesn't exist. wat."
+      );
+    }
+  }
+  res.send("ok");
+});
+
+app.listen(1337, "127.0.0.1");
+
+console.log("TwiML server running at http://127.0.0.1:1337/");
+process.on("exit", () => {
+  calls.keys().forEach(num => calls[num].kill());
+});
