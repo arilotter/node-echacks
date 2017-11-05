@@ -26,7 +26,7 @@ app.post("/call", (req, res) => {
     `${path.join(
       SIP_FOLDER,
       "sip"
-    )} | python -m amodem recv --calibrate --audio-library - --input -`,
+    )} | minimodem --rx -R 8000 300`,
     [],
     { shell: true }
   );
