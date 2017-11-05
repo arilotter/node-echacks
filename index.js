@@ -32,10 +32,14 @@ app.post("/call", (req, res) => {
       console.log(`SIP for ${from} exited.`);
     })
   ];
-  
-  spawn("amodem recv --audio-library - --input fifo.wav", [], {
+
+  const p = spawn("amodem recv --audio-library - --input fifo.wav", [], {
     shell: true
-  }).stdout.on("data", data => {
+  });
+  p.stdout.on("data", data => {
+    console.log(data);
+  });
+  p.stderr.on("data", data => {
     console.log(data);
   });
 
