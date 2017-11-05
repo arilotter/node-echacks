@@ -33,16 +33,6 @@ app.post("/call", (req, res) => {
     })
   ];
 
-  const p = spawn("amodem recv --audio-library - --input fifo.wav", [], {
-    shell: true
-  });
-  p.stdout.on("data", data => {
-    console.log(data);
-  });
-  p.stderr.on("data", data => {
-    console.log(data);
-  });
-
   // Create TwiML response
   const twiml = new VoiceResponse();
   const dial = twiml.dial();
@@ -69,6 +59,15 @@ app.post("/sip", (req, res) => {
   res.set("Content-Type", "text/xml");
   res.send(twiml.toString());
   console.log(`SIP connected.`);
+  const p = spawn("amodem recv --audio-library - --input fifo.wav", [], {
+    shell: true
+  });
+  p.stdout.on("data", data => {
+    console.log(data);
+  });
+  p.stderr.on("data", data => {
+    console.log(data);
+  });
 });
 
 app.post("/status", ({ body }, res) => {
