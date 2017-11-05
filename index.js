@@ -11,6 +11,9 @@ const calls = {};
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
+app.get("/", (req, res) => {
+  res.send('hello!');
+});
 
 app.post("/call", (req, res) => {
   const from = req.body.From;
@@ -65,9 +68,9 @@ app.post("/status", ({ body }, res) => {
   res.send("ok");
 });
 
-app.listen(1337, "127.0.0.1");
+app.listen(80, "0.0.0.0");
 
-console.log("TwiML server running at http://127.0.0.1:1337/");
+console.log("TwiML server running at http://127.0.0.1:80/");
 process.on("exit", () => {
   calls.keys().forEach(num => calls[num].kill());
 });
