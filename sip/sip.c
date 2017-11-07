@@ -55,7 +55,9 @@ static void on_call_media_state(pjsua_call_id call_id)
 
     if (ci.media_status == PJSUA_CALL_MEDIA_ACTIVE)
     {
-        create_recorder(ci);
+        // create_recorder(ci);
+        pjsua_conf_connect(0, ci.conf_slot); // mic to call
+        pjsua_conf_connect(ci.conf_slot, 0); // call to speakers    
     }
 }
 
