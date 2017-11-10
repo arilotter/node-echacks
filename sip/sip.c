@@ -6,6 +6,18 @@
 #define SIP_USER "sip"
 #define SIP_PASSWD "WildWildWest123"
 
+
+/*
+null sample rate: 16000
+mono audio
+16 bits per sample
+
+signed 16 bit pcm
+little endian
+mono
+16000 kHz
+*/
+
 /* Display error and exit application */
 static void error_exit(const char *title, pj_status_t status)
 {
@@ -54,7 +66,11 @@ static void on_call_media_state(pjsua_call_id call_id)
 
     if (ci.media_status == PJSUA_CALL_MEDIA_ACTIVE)
     {
-        create_recorder(ci);
+        // create_recorder(ci);
+        // connect call to loopback device "speakers"
+        pjsua_conf_connect(ci.conf_slot, 0);
+        // connect loopback device "monitor" to call
+        pjsua_conf_connect(0, ci.conf_slot);
     }
 }
 
@@ -83,7 +99,7 @@ int main(int argc, char *argv[])
         status = pjsua_init(&cfg, &log_cfg, NULL);
         if (status != PJ_SUCCESS)
             error_exit("Error in pjsua_init()", status);
-        pjsua_set_null_snd_dev(); // Disable Linux audio support.
+        // pjsua_set_null_snd_dev(); // Disable Linux audio support.
     }
 
     /* Add UDP transport. */

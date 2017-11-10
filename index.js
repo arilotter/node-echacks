@@ -7,7 +7,9 @@ const bodyParser = require("body-parser");
 const VoiceResponse = require("twilio").twiml.VoiceResponse;
 
 const SIP_FOLDER = path.join(__dirname, "sip");
-const FIFO_PATH = path.join(SIP_FOLDER, "fifo.wav");
+const BAUD_RATE = 30;
+const DEMODULATOR_COMMAND = ['minimodem', ['--rx', '--alsa=plughw:0,1,0', BAUD_RATE]]; 
+const MODULATOR_COMMAND = ['minimodem', ['--tx', '--alsa=plughw:0,0,0', BAUD_RATE]]; 
 const calls = {};
 
 const app = express();
@@ -22,26 +24,23 @@ app.post("/call", (req, res) => {
   console.log(`New call from ${from}`);
   console.log("Starting SIP...");
 
-  // const p = spawn(
-  //   `${path.join(
-  //     SIP_FOLDER,
-  //     "sip"
-  //   )}`, // | ffmpeg -hide_banner -loglevel panic -f alaw -i /dev/stdin -ar 8000 -ab 64000 -f ogg /dev/stdout | minimodem --rx -R 8000 -f input.ogg 30
-  //   [],
-  //   { shell: true }
-  // );
-  const p = spawn("echo", ["test"]);
-  p.stdout.on("data", data => {
+  const sip = spawn(path.join(SIP_FOLDER, "sip"), [], { shell: true });
+  const mod = spawn(...MODULATOR_COMMAND);
+  const demod = spawn(...DEMODULATOR_COMMAND);
+
+  sip.stdout.on("data", data => {
     console.log(data.toString("utf8"));
   });
-  p.stderr.on("data", data => {
+  sip.stderr.on("data", data => {
     console.log(data.toString("utf8"));
   });
   p.on("close", () => {
     console.log(`SIP for ${from} closed.`);
+    mod.kill();
+    demod.kill();
     delete calls[from];
   });
-  calls[from] = p;
+  calls[from] = {sip, mod, demod};
 
   // Create TwiML response
   const twiml = new VoiceResponse();
