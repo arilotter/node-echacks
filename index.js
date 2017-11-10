@@ -48,11 +48,10 @@ app.post("/call", (req, res) => {
     console.log(`SIP for ${from} closed.`);
     mod.kill();
     demod.kill();
-    clearTimeout(sendTimer);
     delete calls[from];
   });
 
-  calls[from] = { sip, mod, demod, sendTimer };
+  calls[from] = { sip, mod, demod };
 
   // Create TwiML response
   const twiml = new VoiceResponse();
