@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const VoiceResponse = require("twilio").twiml.VoiceResponse;
 
 const SIP_FOLDER = path.join(__dirname, "sip");
-const BAUD_RATE = 30;
+const BAUD_RATE = 100;
 const calls = {};
 
 const app = express();
@@ -24,12 +24,12 @@ app.post("/call", (req, res) => {
   const sip = spawn(path.join(SIP_FOLDER, "sip"), [], { shell: true });
   // const mod = spawn(
   //   "minimodem",
-  //   ["--tx", "--alsa=plughw:0,0,0", "-R", "16000", "--tx-carrier", BAUD_RATE],
+  //   ["--tx", "--alsa=plughw:0,0,0", "--tx-carrier", BAUD_RATE],
   //   { shell: true }
   // );
   const demod = spawn(
     "minimodem",
-    ["--rx", "--alsa=plughw:0,1,0", "-R", "16000", BAUD_RATE],
+    ["--rx", "--alsa=plughw:0,1,0", BAUD_RATE],
     { shell: true }
   );
   sip.stdout.on("data", data => {
