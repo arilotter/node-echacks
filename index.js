@@ -22,38 +22,38 @@ app.post("/call", (req, res) => {
   console.log("Starting SIP...");
   // SIP NEEDS `sudo modprobe snd-aloop` !
   const sip = spawn(path.join(SIP_FOLDER, "sip"), [], { shell: true });
-  const mod = spawn("minimodem", [
-    "--tx",
-    "--alsa=plughw:0,0,0",
-    "-R",
-    "16000",
-    "--tx-carrier",
-    BAUD_RATE
-  ], { shell: true });
-  const demod = spawn("minimodem", [
-    "--rx",
-    "--alsa=plughw:0,1,0",
-    "-R",
-    "16000",
-    BAUD_RATE
-  ], { shell: true });
+  const mod = spawn(
+    "minimodem",
+    ["--tx", "--alsa=plughw:0,0,0", "-R", "16000", "--tx-carrier", BAUD_RATE],
+    { shell: true }
+  );
+  const demod = spawn(
+    "minimodem",
+    ["--rx", "--alsa=plughw:0,1,0", "-R", "16000", BAUD_RATE],
+    { shell: true }
+  );
   sip.stdout.on("data", data => {
     console.log(data.toString("utf8"));
   });
   sip.stderr.on("data", data => {
     console.log(data.toString("utf8"));
   });
-  demod.stdout.on("data", data => {
+  const pr = data => {
     console.log(data.toString("utf8"));
     // echo any input, reversed
     mod.stdin.write(
-      data
-        .toString("utf8")
-        .split("")
-        .reverse()
-        .join("")
+      Buffer.from(
+        data
+          .toString("utf8")
+          .split("")
+          .reverse()
+          .join(""),
+        "utf8"
+      )
     );
-  });
+  };
+  demod.stdout.on("data", pr);
+  demod.stderr.on("data", pr);
   sip.on("close", () => {
     console.log(`SIP for ${from} closed.`);
     mod.kill();
