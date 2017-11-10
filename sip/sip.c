@@ -134,6 +134,5 @@ int main(int argc, char *argv[])
 
     /* Destroy pjsua */
     pjsua_destroy();
-
     return 0;
 }

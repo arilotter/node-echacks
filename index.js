@@ -28,17 +28,22 @@ app.post("/call", (req, res) => {
   // This is a regular, from-a-telephone call - start the SIP call.
   console.log(`New call from ${from}`);
   console.log("Starting SIP...");
-
+// SIP NEEDS `sudo modprobe snd-aloop` !
   const sip = spawn(path.join(SIP_FOLDER, "sip"));
   const mod = spawn(...MODULATOR_COMMAND);
   const demod = spawn(...DEMODULATOR_COMMAND);
 
   demod.stdout.on("data", data => {
     console.log(data.toString("utf8"));
+    // echo any input, reversed
+    mod.stdin.write(
+      data
+        .toString("utf8")
+        .split("")
+        .reverse()
+        .join("")
+    );
   });
-  const sendTimer = setTimeout(() => {
-    mod.stdin.write("hi ");
-  }, 5000);
   sip.on("close", () => {
     console.log(`SIP for ${from} closed.`);
     mod.kill();
