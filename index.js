@@ -56,7 +56,7 @@ app.post("/call", (req, res) => {
   demod.stderr.on("data", pr);
   sip.on("close", () => {
     // console.log(`SIP for ${from} closed.`);
-    mod.kill();
+    // mod.kill();
     demod.kill();
     delete calls[from];
   });
