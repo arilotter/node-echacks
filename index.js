@@ -28,8 +28,8 @@ app.post("/call", (req, res) => {
   // This is a regular, from-a-telephone call - start the SIP call.
   console.log(`New call from ${from}`);
   console.log("Starting SIP...");
-// SIP NEEDS `sudo modprobe snd-aloop` !
-  const sip = spawn(path.join(SIP_FOLDER, "sip"));
+  // SIP NEEDS `sudo modprobe snd-aloop` !
+  const sip = spawn(path.join(SIP_FOLDER, "sip"), [], { shell: true });
   const mod = spawn(...MODULATOR_COMMAND);
   const demod = spawn(...DEMODULATOR_COMMAND);
 
