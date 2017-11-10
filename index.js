@@ -33,10 +33,10 @@ app.post("/call", (req, res) => {
     { shell: true }
   );
   sip.stdout.on("data", data => {
-    // console.log(data.toString("utf8"));
+    console.log(data.toString("utf8"));
   });
   sip.stderr.on("data", data => {
-    // console.log(data.toString("utf8"));
+    console.log(data.toString("utf8"));
   });
   const pr = data => {
     console.log(data.toString("utf8"));
