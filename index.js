@@ -9,11 +9,11 @@ const SIP_FOLDER = path.join(__dirname, "sip");
 const BAUD_RATE = 30;
 const DEMODULATOR_COMMAND = [
   "minimodem",
-  ["--rx", "--alsa=plughw:0,1,0", BAUD_RATE]
+  ["--rx", "--alsa=plughw:0,1,0", "-R", "16000", BAUD_RATE]
 ];
 const MODULATOR_COMMAND = [
   "minimodem",
-  ["--tx", "--alsa=plughw:0,0,0", BAUD_RATE]
+  ["--tx", "--alsa=plughw:0,0,0", "-R", "16000", "--tx-carrier", BAUD_RATE]
 ];
 const calls = {};
 
