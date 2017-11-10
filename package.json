@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.2",
+    "death": "^1.1.0",
     "express": "^4.16.2",
     "pjsip": "git+https://github.com/hanshuebner/node-pjsip.git",
     "twilio": "^3.9.2"

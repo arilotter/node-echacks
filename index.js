@@ -5,11 +5,14 @@ const fs = require("fs");
 const bodyParser = require("body-parser");
 const VoiceResponse = require("twilio").twiml.VoiceResponse;
 
-const SIP_FOLDER = path.join(__dirname, "sip");
-const BAUD_RATE = 100;
-const calls = {};
+const ON_DEATH = require("death");
 
+const BAUD_RATE = 100;
+const SIP_FOLDER = path.join(__dirname, "sip");
+
+const calls = {};
 const app = express();
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.get("/", (req, res) => {
   res.send("hello!");
@@ -27,11 +30,9 @@ app.post("/call", (req, res) => {
   //   ["--tx", "--alsa=plughw:0,0,0", "--tx-carrier", BAUD_RATE],
   //   { shell: true }
   // );
-  const demod = spawn(
-    "minimodem",
-    ["--rx", "--alsa=plughw:0,1,0", BAUD_RATE],
-    { shell: true }
-  );
+  const demod = spawn("minimodem", ["--rx", "--alsa=plughw:0,1,0", BAUD_RATE], {
+    shell: true
+  });
   sip.stdout.on("data", data => {
     console.log(data.toString("utf8"));
   });
@@ -110,6 +111,10 @@ app.post("/status", ({ body }, res) => {
 app.listen(80, "0.0.0.0");
 
 console.log("TwiML server running at http://127.0.0.1:80/");
-process.on("exit", () => {
-  calls.keys().forEach(num => calls[num].kill());
+
+ON_DEATH(function(signal, err) {
+  calls.values().forEach(({ sip, demod }) => {
+    sip.kill();
+    demod.kill();
+  });
 });
