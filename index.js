@@ -22,11 +22,11 @@ app.post("/call", (req, res) => {
   console.log("Starting SIP...");
   // SIP NEEDS `sudo modprobe snd-aloop` !
   const sip = spawn(path.join(SIP_FOLDER, "sip"), [], { shell: true });
-  const mod = spawn(
-    "minimodem",
-    ["--tx", "--alsa=plughw:0,0,0", "-R", "16000", "--tx-carrier", BAUD_RATE],
-    { shell: true }
-  );
+  // const mod = spawn(
+  //   "minimodem",
+  //   ["--tx", "--alsa=plughw:0,0,0", "-R", "16000", "--tx-carrier", BAUD_RATE],
+  //   { shell: true }
+  // );
   const demod = spawn(
     "minimodem",
     ["--rx", "--alsa=plughw:0,1,0", "-R", "16000", BAUD_RATE],
@@ -41,21 +41,21 @@ app.post("/call", (req, res) => {
   const pr = data => {
     console.log(data.toString("utf8"));
     // echo any input, reversed
-    mod.stdin.write(
-      Buffer.from(
-        data
-          .toString("utf8")
-          .split("")
-          .reverse()
-          .join(""),
-        "utf8"
-      )
-    );
+    // mod.stdin.write(
+    //   Buffer.from(
+    //     data
+    //       .toString("utf8")
+    //       .split("")
+    //       .reverse()
+    //       .join(""),
+    //     "utf8"
+    //   )
+    // );
   };
   demod.stdout.on("data", pr);
   demod.stderr.on("data", pr);
   sip.on("close", () => {
-    console.log(`SIP for ${from} closed.`);
+    // console.log(`SIP for ${from} closed.`);
     mod.kill();
     demod.kill();
     delete calls[from];
