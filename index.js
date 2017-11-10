@@ -94,14 +94,14 @@ app.post("/sip", (req, res) => {
 app.post("/status", ({ body }, res) => {
   console.log(body);
   if (body.CallStatus === "completed") {
-    const { sip, mod, demod } = calls[body.From];
-    if (sip) {
-      console.log(`Killing SIP for ${body.From}`);
-      sip.kill();
-    } else {
+    if (!calls[body.From]) {
       console.log(
         "error: tried to kill a sip instance that doesn't exist. wat."
       );
+    } else {
+      const { sip, mod, demod } = calls[body.From];
+      console.log(`Killing SIP for ${body.From}`);
+      sip.kill();
     }
   }
   res.send("ok");
