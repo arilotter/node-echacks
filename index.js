@@ -113,7 +113,7 @@ app.listen(80, "0.0.0.0");
 console.log("TwiML server running at http://127.0.0.1:80/");
 
 ON_DEATH(function(signal, err) {
-  calls.values().forEach(({ sip, demod }) => {
+  Object.values(calls).forEach(({ sip, demod }) => {
     sip.kill();
     demod.kill();
   });
