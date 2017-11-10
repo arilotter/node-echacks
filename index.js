@@ -7,14 +7,6 @@ const VoiceResponse = require("twilio").twiml.VoiceResponse;
 
 const SIP_FOLDER = path.join(__dirname, "sip");
 const BAUD_RATE = 30;
-const DEMODULATOR_COMMAND = [
-  "minimodem",
-  ["--rx", "--alsa=plughw:0,1,0", "-R", "16000", BAUD_RATE]
-];
-const MODULATOR_COMMAND = [
-  "minimodem",
-  ["--tx", "--alsa=plughw:0,0,0", "-R", "16000", "--tx-carrier", BAUD_RATE]
-];
 const calls = {};
 
 const app = express();
@@ -30,8 +22,21 @@ app.post("/call", (req, res) => {
   console.log("Starting SIP...");
   // SIP NEEDS `sudo modprobe snd-aloop` !
   const sip = spawn(path.join(SIP_FOLDER, "sip"), [], { shell: true });
-  const mod = spawn(...MODULATOR_COMMAND);
-  const demod = spawn(...DEMODULATOR_COMMAND);
+  const mod = spawn("minimodem", [
+    "--tx",
+    "--alsa=plughw:0,0,0",
+    "-R",
+    "16000",
+    "--tx-carrier",
+    BAUD_RATE
+  ]);
+  const demod = spawn("minimodem", [
+    "--rx",
+    "--alsa=plughw:0,1,0",
+    "-R",
+    "16000",
+    BAUD_RATE
+  ]);
   sip.stdout.on("data", data => {
     console.log(data.toString("utf8"));
   });
@@ -89,7 +94,7 @@ app.post("/sip", (req, res) => {
 app.post("/status", ({ body }, res) => {
   console.log(body);
   if (body.CallStatus === "completed") {
-    const {sip, mod, demod} = calls[body.From];
+    const { sip, mod, demod } = calls[body.From];
     if (sip) {
       console.log(`Killing SIP for ${body.From}`);
       sip.kill();
