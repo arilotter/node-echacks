@@ -89,7 +89,7 @@ app.post("/sip", (req, res) => {
 app.post("/status", ({ body }, res) => {
   console.log(body);
   if (body.CallStatus === "completed") {
-    const sip = calls[body.From];
+    const {sip, mod, demod} = calls[body.From];
     if (sip) {
       console.log(`Killing SIP for ${body.From}`);
       sip.kill();
