@@ -1,11 +1,9 @@
-const { exec, spawn } = require("child_process");
+const { spawn } = require("child_process");
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const bodyParser = require("body-parser");
 const VoiceResponse = require("twilio").twiml.VoiceResponse;
-
-const ON_DEATH = require("death");
 
 const BAUD_RATE = 100;
 const SIP_FOLDER = path.join(__dirname, "sip");
@@ -112,7 +110,7 @@ app.listen(80, "0.0.0.0");
 
 console.log("TwiML server running at http://127.0.0.1:80/");
 
-ON_DEATH(function(signal, err) {
+process.on('beforeExit',() => {
   Object.values(calls).forEach(({ sip, demod }) => {
     sip.kill();
     demod.kill();
