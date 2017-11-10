@@ -1,5 +1,4 @@
 const { exec, spawn } = require("child_process");
-const mkfifo = require("mkfifo").mkfifoSync;
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
