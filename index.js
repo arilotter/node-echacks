@@ -24,7 +24,7 @@ app.post("/call", (req, res) => {
   console.log("Starting SIP...");
 
   // const sip = spawn(path.join(SIP_FOLDER, "sip"));
-  const sip = spawn('echo test');
+  const sip = spawn("echo", ["test"]);
   const mod = spawn(...MODULATOR_COMMAND);
   const demod = spawn(...DEMODULATOR_COMMAND);
 
