@@ -29,14 +29,14 @@ app.post("/call", (req, res) => {
     "16000",
     "--tx-carrier",
     BAUD_RATE
-  ]);
+  ], { shell: true });
   const demod = spawn("minimodem", [
     "--rx",
     "--alsa=plughw:0,1,0",
     "-R",
     "16000",
     BAUD_RATE
-  ]);
+  ], { shell: true });
   sip.stdout.on("data", data => {
     console.log(data.toString("utf8"));
   });
